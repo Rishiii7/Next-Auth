@@ -27,7 +27,7 @@ export const {
         error: "/auth/error",
     },
     events: {
-        async linkAccount( {user}) {
+        async linkAccount({ user }) {
             await db.user.update({
                 where: {
                     id : user.id 
@@ -39,12 +39,16 @@ export const {
         }
     },
     callbacks: {
-        // async signIn( {user}) {
-        //     const existingUser = await getUserbyId(user.id);
+        async signIn( {user, account}) {
+            if( account?.provider !== "credentials") return true;
 
-        //     if( !existingUser || !existingUser.emailVerified) return false;
-        //     return true;
-        // },
+            const existingUser = await getUserbyId( user.id );
+            
+            // email not verified
+            if( !existingUser?.emailVerified) return false; 
+
+            return true;
+        },
         async jwt( {token, account }) {
             if( !token.sub) return token;
 
